@@ -1,0 +1,28 @@
+services:
+  reverse-proxy:
+    image: traefik:v3.0 # TODO: update?
+    restart: unless-stopped
+    networks:
+      - network_of_your_service
+    ports:
+      # The HTTP(S) ports
+      - "80:80"
+      - "443:443"
+      # The Web UI (enabled by --api.insecure=true)
+#      - "8080:8080"
+    # TODO: Better way to store token? .env?
+    environment:
+      CF_DNS_API_TOKEN_FILE: /run/secrets/cloudflare_api_token
+    volumes:
+      - "./traefik/:/etc/traefik"
+      - "./logs/:/var/log/traefik"
+    secrets:
+      - cloudflare_api_token
+
+secrets:
+  cloudflare_api_token:
+    file: ./cloudflare_api_token.txt
+
+networks:
+  network_of_your_service:
+    external: True

@@ -1,0 +1,20 @@
+http:
+  routers:
+    traefik_api:
+      entryPoints:
+        - https
+      # TODO: Can I store the domain in .env or so?
+      rule: "Host(`infra.domain`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))"
+      tls:
+        certResolver: cloudflare
+      middlewares:
+        - auth
+      service: api@internal
+
+  middlewares:
+    auth:
+      basicAuth:
+        # TODO: instructions on generating hashes (script maybe?)
+        # TODO: can it be stored in .env or other more central, more secure place
+        users:
+          - "user:$hash"
